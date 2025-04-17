@@ -3,6 +3,8 @@
 
 This project integrates Calibre Web with a live chat feature using N8N. It provides a real-time chat experience within the Calibre Web interface, allowing users to interact with support or automated systems directly within their ebook library.
 
+The goal of this is to have N8N with a vector DB read all my books in my library. And have the chat bot to respond with answers from my library - and reference the correct books. I still have a good way to go on the backend.
+
 ## Features
 - Real-time chat integration with Calibre Web
 - Dynamic webhook URL configuration via environment variables
