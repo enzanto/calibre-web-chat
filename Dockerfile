@@ -5,19 +5,29 @@ COPY css/ /app/calibre-web/cps/static/css
 COPY js/ /app/calibre-web/cps/static/js
 
 # Inject the HTML snippet into layout.html before </body>
-RUN sed -i '/<\/body>/i \
-{% if current_user.is_authenticated or g.allow_anonymous %}\
-<link href="/static/css/style.css" rel="stylesheet" />\n\
-<script type="module">\n\
-    import { createChat } from '\''/static/js/chat.bundle.es.js'\'';\n\
-    createChat({\n\
-        webhookUrl: '\''https://n8n.nerdiverset.no/webhook/b818f9b2-27cf-4f7f-94fb-a6c205005c28/chat'\''\n\
-    });\n\
+RUN sed -i "/<\/body>/i {% if current_user.is_authenticated or g.allow_anonymous %}\
+<link href=\"/static/css/style.css\" rel=\"stylesheet\" />\
+<script type=\"module\">\
+    import { createChat } from '/static/js/chat.bundle.es.js';\
+    createChat({\
+        webhookUrl: '{{ n8n_webhook }}'\
+    });\
 </script>\
-{% endif %}' /app/calibre-web/cps/templates/layout.html
+{% endif %}" /app/calibre-web/cps/templates/layout.html
 
 
-RUN sed -i "/csp += \"; object-src 'none';\"/i \ \ \ \ csp += \"; connect-src 'self' http://n8n.nerdiverset.no\"" /app/calibre-web/cps/web.py
+# Inject CSP with N8N_HOST env variable
+RUN sed -i "/csp += \"; object-src 'none';\"/i \ \ \ \ n8n_host = os.getenv('N8N_HOST', 'https://example.domain.com')\n    csp += \"; connect-src 'self' \" + n8n_host" /app/calibre-web/cps/web.py
+
+
+RUN sed -i "/from .string_helper import strip_whitespaces/a \
+@app.context_processor\n\
+def inject_env_vars():\n\
+    return {\n\
+        'n8n_webhook': os.getenv('N8N_WEBHOOK', 'https://default.example.com/webhook/default/chat')\n\
+    }\n" /app/calibre-web/cps/web.py
+
+
 
 
 #debugging tools
