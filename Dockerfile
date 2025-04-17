@@ -6,7 +6,7 @@ COPY js/ /app/calibre-web/cps/static/js
 
 # Inject the HTML snippet into layout.html before </body>
 RUN sed -i "/<\/body>/i {% if current_user.is_authenticated or g.allow_anonymous %}\
-<link href=\"/static/css/style.css\" rel=\"stylesheet\" />\
+<link href=\"/static/css/chat-style.css\" rel=\"stylesheet\" />\
 <script type=\"module\">\
     import { createChat } from '/static/js/chat.bundle.es.js';\
     createChat({\
@@ -30,7 +30,3 @@ def inject_env_vars():\n\
 
 
 
-#debugging tools
-RUN apt update
-RUN apt install vim -y
-RUN apt install wget -y
